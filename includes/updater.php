@@ -10,35 +10,22 @@ function wmc_check_for_plugin_update( $checked_data ) {
         return $checked_data;
     }
 
-    // Check if a transient exists
-    $transient_key   = 'wmc_update_' . $plugin_slug;
-    $cached_response = get_transient( $transient_key );
+    $request_args = [
+        'slug'    => $plugin_slug,
+        'version' => $checked_data->checked[ $plugin_slug . '/' . $plugin_slug . '.php' ],
+    ];
 
-    if ( $cached_response === false ) {
-        // No transient, prepare API request
-        $request_args = [
-            'slug'    => $plugin_slug,
-            'version' => $checked_data->checked[ $plugin_slug . '/' . $plugin_slug . '.php' ],
-        ];
+    $request_string = wmc_prepare_request( 'basic_check', $request_args );
 
-        $request_string = wmc_prepare_request( 'basic_check', $request_args );
+    // Start checking for an update
+    $raw_response = wp_remote_post( $api_url, $request_string );
 
-        // Start checking for an update
-        $raw_response = wp_remote_post( $api_url, $request_string );
-
-        if ( ! is_wp_error( $raw_response ) && ( (int) $raw_response['response']['code'] === 200 ) ) {
-            $cached_response = unserialize( $raw_response['body'] );
-
-            if ( is_object( $cached_response ) ) {
-                // Cache the response in a transient for 4 hours
-                set_transient( $transient_key, $cached_response, 4 * HOUR_IN_SECONDS );
-            }
-        }
+    if ( ! is_wp_error( $raw_response ) && ( (int) $raw_response['response']['code'] === 200 ) ) {
+        $response = unserialize( $raw_response['body'] );
     }
 
-    // Feed the update data into WP updater
-    if ( is_object( $cached_response ) && ! empty( $cached_response ) ) {
-        $checked_data->response[ $plugin_slug . '/' . $plugin_slug . '.php' ] = $cached_response;
+    if ( is_object( $response ) && ! empty( $response ) ) { // Feed the update data into WP updater
+        $checked_data->response[ $plugin_slug . '/' . $plugin_slug . '.php' ] = $response;
     }
 
     return $checked_data;
@@ -51,8 +38,13 @@ function wmc_plugin_api_call( $def, $action, $args ) {
     $api_url     = 'https://getbutterfly.com/web/wp/update/';
     $plugin_slug = 'woo-multi-currency';
 
-    // Return default behavior for non-relevant plugins or non-info actions
-    if ( empty( $args->slug ) || $args->slug !== $plugin_slug || $action !== 'plugin_information' ) {
+    // Do nothing if this is not about getting plugin information
+    if ( $action !== 'plugin_information' ) {
+        return false;
+    }
+
+    if ( (string) $args->slug !== (string) $plugin_slug ) {
+        // Conserve the value of previous filter of plugins list in alternate API
         return $def;
     }
 
@@ -66,12 +58,12 @@ function wmc_plugin_api_call( $def, $action, $args ) {
     $request = wp_remote_post( $api_url, $request_string );
 
     if ( is_wp_error( $request ) ) {
-        $res = new WP_Error( 'plugins_api_failed', __( 'An Unexpected HTTP Error occurred during the API request.</p> <p><a href="?" onclick="document.location.reload(); return false;">Try again</a>', 'woocommerce-conditional-blocks' ), $request->get_error_message() );
+        $res = new WP_Error( 'plugins_api_failed', __( 'An Unexpected HTTP Error occurred during the API request.</p> <p><a href="?" onclick="document.location.reload(); return false;">Try again</a>', 'woo-multi-currency' ), $request->get_error_message() );
     } else {
         $res = unserialize( $request['body'] );
 
         if ( $res === false ) {
-            $res = new WP_Error( 'plugins_api_failed', __( 'An unknown error occurred', 'lighthouse' ), $request['body'] );
+            $res = new WP_Error( 'plugins_api_failed', __( 'An unknown error occurred', 'woo-multi-currency' ), $request['body'] );
         }
     }
 
