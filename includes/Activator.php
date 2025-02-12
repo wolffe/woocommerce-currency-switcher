@@ -2,8 +2,7 @@
 namespace Wpdcs\WooCommerceCurrencySwitcher;
 
 class Activator {
-    private static $_instance = null;
-
+    private static $_instance  = null;
     private static $_activator = false;
 
     private function __construct() {

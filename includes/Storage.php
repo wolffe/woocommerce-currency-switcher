@@ -8,9 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * This class defines caching for currency.
  */
-
 class Storage {
-
     // Hold the class instance.
     private static $_instance = null;
 
@@ -24,7 +22,6 @@ class Storage {
         }
 
         if ( 'session' == $this->type ) {
-
             add_action( 'template_redirect', [ $this, 'wccs_check_for_existing_session' ] );
         }
 

@@ -1,15 +1,24 @@
-/* Give selected element 'crnt' class */
-jQuery(document).ready(function ($) {
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".wcc-sticky-list li").forEach(function (item) {
+        item.addEventListener("click", function () {
+            let selectedItemHTML = this.innerHTML;
+            document.querySelectorAll(".wcc-sticky-list .crnt").forEach(function (el) {
+                el.classList.remove("crnt");
+            });
+            this.classList.add("crnt");
 
-    $(".wcc-sticky-list li").on("click", function () {
+            let code = this.getAttribute("data-code");
+            let switcher = document.querySelector(".wccs_sticky_form .wcc_switcher");
+            if (switcher) {
+                switcher.value = code;
+            }
 
-        var selectedItemHTML = $(this).html();
-        $(".wcc-sticky-list").find(".crnt").removeClass("crnt");
-        $(this).addClass("crnt");
-        var code = $(this).data('code');
-        $('.wccs_sticky_form .wcc_switcher').val(code);
-        setTimeout(function () {
-            $('form.wccs_sticky_form').submit();
-        }, 500);
+            setTimeout(function () {
+                let form = document.querySelector("form.wccs_sticky_form");
+                if (form) {
+                    form.submit();
+                }
+            }, 500);
+        });
     });
 });

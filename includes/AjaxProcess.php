@@ -229,7 +229,7 @@ if ( ! class_exists( 'AjaxProcess' ) ) {
                             foreach ( $avl_payment_gateways as $payment ) {
 
                                 $checked = ( isset( $info['payment_gateways'] ) && in_array( $payment['id'], $info['payment_gateways'] ) ) ? 'checked="true"' : '';
-                                $html   .= '<li> <label for="' . $code . '_' . $payment['id'] . '" > <input type="checkbox" id="' . $code . '_' . $payment['id'] . '" name="wccs_currencies[' . $code . '][payment_gateways][]" value="' . $payment['id'] . '" ' . $checked . ' />' . $payment['title'] . '</label></li>';
+                                $html   .= '<li> <label for="' . $code . '_' . $payment['id'] . '" > <input type="checkbox" id="' . $code . '_' . $payment['id'] . '" name="wccs_currencies[' . $code . '][payment_gateways][]" value="' . $payment['id'] . '" ' . $checked . '>' . $payment['title'] . '</label></li>';
                             }
                             $html .= '</ul></div>';
                         } else {

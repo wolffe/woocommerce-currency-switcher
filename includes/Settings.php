@@ -8,18 +8,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * This class defines wccs settings for the plugin.
  */
-
 if ( ! class_exists( 'Settings' ) ) {
-
     class Settings {
-
-        // Hold the class instance.
         private static $_instance = null;
-
         private $default_currency = null;
 
         public function __construct() {
-
             $this->default_currency = get_woocommerce_currency();
 
             // add plugin setting page
@@ -135,12 +129,12 @@ if ( ! class_exists( 'Settings' ) ) {
 
                 ?>
                 <div class="wccs_fixed_coupon_settings">
-                    <h3>WC Currency Switcher - the coupon Minimum and Maximum Spend</h3>
+                    <h3>WooCommerce Currency Switcher - Minimum and Maximum Spend</h3>
                     <?php
                     if ( ! empty( $currencies ) ) {
                         ?>
                         <select class="wccs_get_defined_currency">
-                            <option value=""><?php echo esc_html( '--select currency--', 'wccs' ); ?></option>
+                            <option value=""><?php echo esc_html( 'Select currency...', 'wccs' ); ?></option>
                             <?php
                             foreach ( $currencies as $currency_code => $currency_data ) {
                                 ?>
@@ -161,13 +155,13 @@ if ( ! class_exists( 'Settings' ) ) {
                             foreach ( $wccs_cfa_minmax_data as $code => $value ) {
                                 ?>
                                 <p class=" form-field discount_type_field">
-                                    <input type="hidden" name="wccs_cfa_minmax_code[]" value="<?php echo esc_attr( $code ); ?>" />
-                                    
+                                    <input type="hidden" name="wccs_cfa_minmax_code[]" value="<?php echo esc_attr( $code ); ?>">
+
                                     <span class="wccs_form_control">
                                         <label for="wccs_cfa_min_value">
                                             <strong>Minimum spend (<?php echo esc_attr( $code ); ?>): </strong>                    
                                         </label>                                
-                                        <input type="text" id="wccs_cfa_min_value" name="wccs_cfa_min_value[]" Placeholder="auto" value="<?php echo esc_attr( $value['min'] ); ?>" />
+                                        <input type="text" id="wccs_cfa_min_value" name="wccs_cfa_min_value[]" Placeholder="auto" value="<?php echo esc_attr( $value['min'] ); ?>">
                                         <a href="#" class="ml-10 button button-secondary wccs_cfa_remove">remove</a>
                                     </span>
 
@@ -175,7 +169,7 @@ if ( ! class_exists( 'Settings' ) ) {
                                         <label for="wccs_cfa_min_value">
                                             <strong>Maximum spend (<?php echo esc_attr( $code ); ?>): </strong>                    
                                         </label>
-                                        <input type="text" id="wccs_cfa_max_value" name="wccs_cfa_max_value[]" Placeholder="auto" value="<?php echo esc_attr( $value['max'] ); ?>" />
+                                        <input type="text" id="wccs_cfa_max_value" name="wccs_cfa_max_value[]" Placeholder="auto" value="<?php echo esc_attr( $value['max'] ); ?>">
                                     </span>                             
                                 </p>
                                 <?php
@@ -204,13 +198,13 @@ if ( ! class_exists( 'Settings' ) ) {
 
                 ?>
                 <div class="wccs_fixed_coupon_settings">
-                    <h3>WC Currency Switcher - the coupon fixed amount</h3>
+                    <h3>WooCommerce Currency Switcher - Fixed Amount</h3>
                     <input type="hidden" name="wccs_coupon_nonce" value="<?php echo esc_attr( wp_create_nonce( 'wccs_coupon_nonce' ) ); ?>">
                     <?php
                     if ( ! empty( $currencies ) ) {
                         ?>
                         <select class="wccs_get_defined_currency">
-                            <option value="">--select currency--</option>
+                            <option value="">Select currency...</option>
                             <?php
                             foreach ( $currencies as $currency_code => $currency_data ) {
                                 ?>
@@ -234,8 +228,8 @@ if ( ! class_exists( 'Settings' ) ) {
                                     <label for="wccs_cfa_value">
                                         <strong>Coupon amount (<?php echo esc_attr( $code ); ?>): </strong>                    
                                     </label>
-                                    <input type="hidden" name="wccs_cfa_code[]" value="<?php echo esc_attr( $code ); ?>" />
-                                    <input type="text" id="wccs_cfa_value" name="wccs_cfa_value[]" Placeholder="auto" value="<?php echo esc_attr( $value ); ?>" />
+                                    <input type="hidden" name="wccs_cfa_code[]" value="<?php echo esc_attr( $code ); ?>">
+                                    <input type="text" id="wccs_cfa_value" name="wccs_cfa_value[]" Placeholder="auto" value="<?php echo esc_attr( $value ); ?>">
                                     <a href="#" class="ml-10 button button-secondary wccs_cfa_remove">remove</a>
                                 </p>
                                 <?php
@@ -489,7 +483,7 @@ if ( ! class_exists( 'Settings' ) ) {
 
                                                                     $checked = ( isset( $info['payment_gateways'] ) && in_array( $payment['id'], $info['payment_gateways'] ) ) ? 'checked="true"' : '';
                                                                     ?>
-                                                            <li> <label for="<?php echo esc_attr( $code ) . '_' . esc_attr( $payment['id'] ); ?>"> <input type="checkbox" id="<?php echo esc_attr( $code ) . '_' . esc_attr( $payment['id'] ); ?>" name="wccs_currencies[<?php echo esc_attr( $code ); ?>][payment_gateways][]" value="<?php echo esc_attr( $payment['id'] ); ?>" <?php echo esc_attr( $checked ); ?> /></label><?php echo esc_attr( $payment['title'] ); ?> </label></li>
+                                                            <li> <label for="<?php echo esc_attr( $code ) . '_' . esc_attr( $payment['id'] ); ?>"> <input type="checkbox" id="<?php echo esc_attr( $code ) . '_' . esc_attr( $payment['id'] ); ?>" name="wccs_currencies[<?php echo esc_attr( $code ); ?>][payment_gateways][]" value="<?php echo esc_attr( $payment['id'] ); ?>" <?php echo esc_attr( $checked ); ?>></label><?php echo esc_attr( $payment['title'] ); ?> </label></li>
                                                                     <?php
                                                                 }
                                                                 ?>
@@ -576,22 +570,22 @@ if ( ! class_exists( 'Settings' ) ) {
                                 <th scope="row"><?php esc_html_e( 'API key', 'wccs' ); ?></th>
                                 <td class="open_exchange_rate" style="display: none">
                                     <input type="text" name="wccs_oer_api_key" value="<?php echo esc_attr( get_multisite_or_site_option( 'wccs_oer_api_key', false ) ); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e( 'Add Open Exchange Rates API key to be used to get exchange rate data (it is required). You can get from here:', 'wccs' ); ?> <a href="https://openexchangerates.org/signup" target="_blank"><?php esc_html_e( 'Get API Key', 'wccs' ); ?></a><br/><?php esc_html_e( 'For API limitations', 'wccs' ); ?> <a href="https://openexchangerates.org/signup" target="_blank"><?php esc_html_e( 'Click here', 'wccs' ); ?></a></p>
+                                    <p class="description"><?php esc_html_e( 'Add Open Exchange Rates API key to be used to get exchange rate data (it is required). You can get from here:', 'wccs' ); ?> <a href="https://openexchangerates.org/signup" target="_blank"><?php esc_html_e( 'Get API Key', 'wccs' ); ?></a><br><?php esc_html_e( 'For API limitations', 'wccs' ); ?> <a href="https://openexchangerates.org/signup" target="_blank"><?php esc_html_e( 'Click here', 'wccs' ); ?></a></p>
                                 </td>
 
                                 <td class="abstract_api" style="display: none">
                                     <input type="text" name="wccs_aer_api_key" value="<?php echo esc_attr( get_multisite_or_site_option( 'wccs_aer_api_key', false ) ); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e( 'Add AbstractApi Exchange Rates API key to be used to get exchange rate data (it is required). You can get from here:', 'wccs' ); ?> <a href="https://www.abstractapi.com/api/exchange-rate-api" target="_blank"><?php esc_html_e( 'Get API Key', 'wccs' ); ?></a><br/><?php esc_html_e( 'For API limitations', 'wccs' ); ?> <a href="https://www.abstractapi.com/api/exchange-rate-api" target="_blank"><?php esc_html_e( 'Click here', 'wccs' ); ?></a></p>
+                                    <p class="description"><?php esc_html_e( 'Add AbstractApi Exchange Rates API key to be used to get exchange rate data (it is required). You can get from here:', 'wccs' ); ?> <a href="https://www.abstractapi.com/api/exchange-rate-api" target="_blank"><?php esc_html_e( 'Get API Key', 'wccs' ); ?></a><br><?php esc_html_e( 'For API limitations', 'wccs' ); ?> <a href="https://www.abstractapi.com/api/exchange-rate-api" target="_blank"><?php esc_html_e( 'Click here', 'wccs' ); ?></a></p>
                                 </td>
 
                                 <td class="api_layer_fixer" style="display: none">
                                     <input type="text" name="wccs_alf_api_key" value="<?php echo esc_attr( get_multisite_or_site_option( 'wccs_alf_api_key', false ) ); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e( 'Add API Layer Fixer Rates API key to be used to get exchange rate data (it is required). You can get from here:', 'wccs' ); ?> <a href="https://apilayer.com/marketplace/fixer-api" target="_blank"><?php esc_html_e( 'Get API Key', 'wccs' ); ?></a><br/><?php esc_html_e( 'For API limitations', 'wccs' ); ?> <a href="https://apilayer.com/marketplace/fixer-api" target="_blank"><?php esc_html_e( 'Click here', 'wccs' ); ?></a></p>
+                                    <p class="description"><?php esc_html_e( 'Add API Layer Fixer Rates API key to be used to get exchange rate data (it is required). You can get from here:', 'wccs' ); ?> <a href="https://apilayer.com/marketplace/fixer-api" target="_blank"><?php esc_html_e( 'Get API Key', 'wccs' ); ?></a><br><?php esc_html_e( 'For API limitations', 'wccs' ); ?> <a href="https://apilayer.com/marketplace/fixer-api" target="_blank"><?php esc_html_e( 'Click here', 'wccs' ); ?></a></p>
                                 </td>
 
                                 <td class="exchange_rate_api" style="display: none">
                                     <input type="text" name="wccs_era_api_key" value="<?php echo esc_attr( get_multisite_or_site_option( 'wccs_era_api_key', false ) ); ?>" class="regular-text">
-                                    <p class="description"><?php esc_html_e( 'Add Exchange Rates API key to be used to get exchange rate data (it is required). You can get from here:', 'wccs' ); ?> <a href="https://www.exchangerate-api.com/" target="_blank"><?php esc_html_e( 'Get API Key', 'wccs' ); ?></a><br/><?php esc_html_e( 'For API limitations', 'wccs' ); ?> <a href="https://www.exchangerate-api.com/" target="_blank"><?php esc_html_e( 'Click here', 'wccs' ); ?></a></p>
+                                    <p class="description"><?php esc_html_e( 'Add Exchange Rates API key to be used to get exchange rate data (it is required). You can get from here:', 'wccs' ); ?> <a href="https://www.exchangerate-api.com/" target="_blank"><?php esc_html_e( 'Get API Key', 'wccs' ); ?></a><br><?php esc_html_e( 'For API limitations', 'wccs' ); ?> <a href="https://www.exchangerate-api.com/" target="_blank"><?php esc_html_e( 'Click here', 'wccs' ); ?></a></p>
                                 </td>
                             </tr>
                             
@@ -617,7 +611,7 @@ if ( ! class_exists( 'Settings' ) ) {
                                 <td>
                                     <label for="wccs_admin_email">
                                         <input type="checkbox" id="wccs_admin_email" name="wccs_admin_email" value="1" <?php if ( get_multisite_or_site_option( 'wccs_admin_email', 0 ) ) { ?> 
-                                        checked <?php } ?> />
+                                        checked <?php } ?>>
                                         <?php esc_html_e( 'Send a notification email', 'wccs' ); ?>
                                     </label>
                                     <p class="description"><?php esc_html_e( 'Check this if you want an email to be sent each time a currency rate changes. Default is unchecked.', 'wccs' ); ?></p>
@@ -628,7 +622,7 @@ if ( ! class_exists( 'Settings' ) ) {
                                 <th scope="row"><?php esc_html_e( 'Email', 'wccs' ); ?></th>
                                 <td>
                                     <input type="email" name="wccs_email" value="<?php if ( get_multisite_or_site_option( 'wccs_email', false ) ) { ?>
-                                    <?php echo esc_attr( get_multisite_or_site_option( 'wccs_email', false ) ); } ?>"/>
+                                    <?php echo esc_attr( get_multisite_or_site_option( 'wccs_email', false ) ); } ?>">
                                     <p class="description"><?php esc_html_e( 'Add the email that will receive the updated rates. If left empty, the email will be sent to admin email. (Note: if an email address is added, only it will receive the email.)', 'wccs' ); ?></p>
                                 </td>
                             </tr>
@@ -674,7 +668,7 @@ if ( ! class_exists( 'Settings' ) ) {
                                                         value="<?php echo esc_attr( $lower_case_country ); ?>"
                                                         <?php echo esc_attr( $selected ); ?>
                                                         data-prefix="<span class='wcc-flag flag-icon flag-icon-<?php echo esc_attr( $lower_case_country ); ?>'></span>">
-                                                        <?php echo esc_attr( $country ); ?>
+                                                        <?php echo esc_attr( $country ); ?> <?php echo wccs_country_to_emoji( $lower_case_country ); ?>
                                                     </option>
                                                     <?php
                                                 }
@@ -691,7 +685,7 @@ if ( ! class_exists( 'Settings' ) ) {
                                 <td>
                                     <label for="wccs_show_flag">
                                         <input type="checkbox" id="wccs_show_flag" name="wccs_show_flag" value="1" <?php if ( get_multisite_or_site_option( 'wccs_show_flag', 1 ) ) { ?> 
-                                        checked <?php } ?> />
+                                        checked <?php } ?>>
                                         <?php esc_html_e( 'Show country flag', 'wccs' ); ?>
                                     </label>
                                     <p class="description"><?php esc_html_e( 'Check this if you want the switcher to have country flag. Default is checked.', 'wccs' ); ?></p>
@@ -703,7 +697,7 @@ if ( ! class_exists( 'Settings' ) ) {
                                 <td>
                                     <label for="wccs_pay_by_user_currency">
                                         <input type="checkbox" id="wccs_pay_by_user_currency" name="wccs_pay_by_user_currency" value="1" <?php if ( get_multisite_or_site_option( 'wccs_pay_by_user_currency', false ) ) { ?> 
-                                        checked <?php } ?> />
+                                        checked <?php } ?>>
                                         <?php esc_html_e( 'Pay in user selected currency', 'wccs' ); ?>
                                     </label>
                                     <p class="description"><?php esc_html_e( 'Check this option to let user pay in their selected currency. Default is unchecked.', 'wccs' ); ?></p>
@@ -715,7 +709,7 @@ if ( ! class_exists( 'Settings' ) ) {
                                 <td>
                                     <label for="wccs_fixed_coupon_amount">
                                         <input type="checkbox" id="wccs_fixed_coupon_amount" name="wccs_fixed_coupon_amount" value="1" <?php if ( get_multisite_or_site_option( 'wccs_fixed_coupon_amount', 0 ) ) { ?>
-                                        checked<?php } ?> />
+                                        checked<?php } ?>>
                                         <?php esc_html_e( 'Enable to set fixed amount for coupon against specific currency', 'wccs' ); ?>
                                     </label>
                                     <p class="description"><?php esc_html_e( 'Pay in user selected currency option should be enabled.', 'wccs' ); ?></p>
@@ -727,7 +721,7 @@ if ( ! class_exists( 'Settings' ) ) {
                                 <td>
                                     <label for="wccs_show_currency">
                                         <input type="checkbox" id="wccs_show_currency" name="wccs_show_currency" value="1" <?php if ( get_multisite_or_site_option( 'wccs_show_currency', 1 ) ) { ?>
-                                        checked<?php } ?> />
+                                        checked<?php } ?>>
                                         <?php esc_html_e( 'Show currency symbol', 'wccs' ); ?>
                                     </label>
                                     <p class="description"><?php esc_html_e( 'Check this if you want the switcher to have currency symbol. Default is checked.', 'wccs' ); ?></p>
@@ -742,7 +736,7 @@ if ( ! class_exists( 'Settings' ) ) {
                                     <td>
                                         <label for="wccs_currency_by_lang">
                                             <input type="checkbox" id="wccs_currency_by_lang" name="wccs_currency_by_lang" value="1" <?php if ( get_multisite_or_site_option( 'wccs_currency_by_lang', false ) ) { ?>
-                                            checked<?php } ?> />
+                                            checked<?php } ?>>
                                             <?php esc_html_e( 'Enable to change currency according to the users language.', 'wccs' ); ?>
                                         </label>
                                         <p class="description"><?php esc_html_e( 'Enable to change currency by WPML language.', 'wccs' ); ?></p>
@@ -803,7 +797,7 @@ if ( ! class_exists( 'Settings' ) ) {
                                 <td>
                                     <label for="wccs_show_in_menu">
                                         <input type="checkbox" id="wccs_show_in_menu" name="wccs_show_in_menu" value="1" <?php if ( get_multisite_or_site_option( 'wccs_show_in_menu', 0 ) ) { ?> 
-                                        checked <?php } ?> />
+                                        checked <?php } ?>>
                                         <?php esc_html_e( 'Add switcher as a menu item', 'wccs' ); ?>
                                     </label>
                                     <p class="description"><?php esc_html_e( 'Check this if you want to add switcher to a menu as a menu and submenu item. Default is unchecked.', 'wccs' ); ?></p>
@@ -839,17 +833,11 @@ if ( ! class_exists( 'Settings' ) ) {
                             <tr valign="top">
                                 <th scope="row"><?php esc_html_e( 'Switcher Style', 'wccs' ); ?></th>
                                 <td>
-                                    <select name="wccs_shortcode_style">
+                                    <select name="wccs_shortcode_style" readonly>
                                         <option value="style_01"<?php if ( 'style_01' == get_multisite_or_site_option( 'wccs_shortcode_style', 'style_01' ) ) { ?> 
                                         selected<?php } ?>><?php esc_html_e( 'Style 1', 'wccs' ); ?></option>
-                                        <option value="style_02"<?php if ( 'style_02' == get_multisite_or_site_option( 'wccs_shortcode_style', 'style_01' ) ) { ?> 
-                                        selected<?php } ?>><?php esc_html_e( 'Style 2', 'wccs' ); ?></option>
-                                        <option value="style_03"<?php if ( 'style_03' == get_multisite_or_site_option( 'wccs_shortcode_style', 'style_01' ) ) { ?> 
-                                        selected<?php } ?>><?php esc_html_e( 'Style 3', 'wccs' ); ?></option>
-                                        <option value="style_04"<?php if ( 'style_04' == get_multisite_or_site_option( 'wccs_shortcode_style', 'style_01' ) ) { ?> 
-                                        selected<?php } ?>><?php esc_html_e( 'Style 4', 'wccs' ); ?></option>
                                     </select>
-                                    <p class="description"><?php esc_html_e( 'Choose different style for [wcc_switcher] shortcode. You can also override the style for specific shortcode using attribute ex: [wcc_switcher style="style_02"]. Default is Style 1.', 'wccs' ); ?></p>
+                                    <p class="description"><?php esc_html_e( 'Choose different style for [wcc_switcher] shortcode. Default is Style 1.', 'wccs' ); ?></p>
                                 </td>
                             </tr>
                             
@@ -858,7 +846,7 @@ if ( ! class_exists( 'Settings' ) ) {
                                 <td>
                                     <label for="wccs_sticky_switcher">
                                         <input type="checkbox" id="wccs_sticky_switcher" name="wccs_sticky_switcher" value="1" <?php if ( get_multisite_or_site_option( 'wccs_sticky_switcher', 0 ) ) { ?>
-                                        checked<?php } ?> />
+                                        checked<?php } ?>>
                                         <?php esc_html_e( 'Add sticky switcher', 'wccs' ); ?>
                                     </label>
                                     <p class="description"><?php esc_html_e( 'Check this if you want to add sticky switcher to all website pages. Default is unchecked.', 'wccs' ); ?></p>

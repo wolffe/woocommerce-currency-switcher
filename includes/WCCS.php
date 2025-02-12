@@ -122,9 +122,6 @@ if ( ! class_exists( 'WCCS' ) ) {
             // add rates shortcode
             add_shortcode( 'wcc_rates', [ $this, 'wcc_rates_shortcode_callback' ] );
 
-            // register widgets
-            add_action( 'widgets_init', [ $this, 'wccs_widgets' ] );
-
             add_filter( 'wp_get_nav_menu_items', [ $this, 'wccs_get_nav_menu_items_filter' ], 999, 3 );
 
             // add sticky switcher
@@ -1186,8 +1183,8 @@ if ( ! class_exists( 'WCCS' ) ) {
             ];
 
             // Compatible with WooCommerce Measurement Price Calculator
-            wp_enqueue_script( 'wccs_price_conveter', WCCS_PLUGIN_URL . 'assets/frontend/js/wccs_price_conveter.js', [ 'jquery', 'wc-price-calculator' ], '1.0' );
-            wp_localize_script( 'wccs_price_conveter', 'currency_convert_rate', $currency_convert_rate );
+            //wp_enqueue_script( 'wccs_price_conveter', WCCS_PLUGIN_URL . 'assets/frontend/js/wccs_price_conveter.js', [ 'jquery', 'wc-price-calculator' ], '1.0' );
+            //wp_localize_script( 'wccs_price_conveter', 'currency_convert_rate', $currency_convert_rate );
 
             if ( get_multisite_or_site_option( 'wccs_show_in_menu', 0 ) ) {
                 wp_enqueue_style( 'wccs_flags_style', WCCS_PLUGIN_URL . 'assets/lib/flag-icon/flag-icon.css', '', '1.0' );
@@ -2031,7 +2028,7 @@ if ( ! class_exists( 'WCCS' ) ) {
                 $atts
             );
 
-            if ( $args['style'] && in_array( $args['style'], [ 'style_01', 'style_02', 'style_03', 'style_04' ] ) ) {
+            if ( $args['style'] && in_array( $args['style'], [ 'style_01' ] ) ) {
                 $style = $args['style'];
             } else {
                 $style = get_multisite_or_site_option( 'wccs_shortcode_style', 'style_01' );
@@ -2085,10 +2082,6 @@ if ( ! class_exists( 'WCCS' ) ) {
             return ob_get_clean();
         }
 
-        public function wccs_widgets() {
-            register_widget( '\Wpdcs\WooCommerceCurrencySwitcher\SwitcherWidget' );
-        }
-
         public function wccs_get_nav_menu_items_filter( $items, $menu, $args ) {
             if ( ! apply_filters( 'wccs_before_nav_menu', true ) ) {
                 return $items;
@@ -2118,7 +2111,7 @@ if ( ! class_exists( 'WCCS' ) ) {
             // }
 
             if ( get_multisite_or_site_option( 'wccs_show_in_menu', 0 ) && ! is_admin() ) {
-                $toAdd            = [];
+                $to_add           = [];
                 $target_menu      = get_multisite_or_site_option( 'wccs_switcher_menu', '' );
                 $show_flag        = get_multisite_or_site_option( 'wccs_show_flag', 1 );
                 $show_currency    = get_multisite_or_site_option( 'wccs_show_currency', 1 );
@@ -2153,7 +2146,7 @@ if ( ! class_exists( 'WCCS' ) ) {
                     $title             = apply_filters( 'wccs_change_menu_default_currency_label', $default_label, $default_currency );
 
                     if ( $show_currency ) {
-                        $title .= ' "' . $default_symbol . '" ';
+                        $title .= ' (' . $default_symbol . ') ';
                     }
                     if ( $show_flag ) {
                         $title .= ' <span class="wcc-flag flag-icon flag-icon-' . $item['default_currency_flag'] . '"></span>';
@@ -2161,7 +2154,7 @@ if ( ! class_exists( 'WCCS' ) ) {
                     $item['title'] = $title;
                     $item['url']   = '#' . $default_currency;
 
-                    $toAdd[] = (object) $item;
+                    $to_add[] = (object) $item;
 
                     foreach ( $currencies as $code => $info ) {
                         ++$counter;
@@ -2190,7 +2183,7 @@ if ( ! class_exists( 'WCCS' ) ) {
 
                         $title = apply_filters( 'wccs_change_default_currency_label', $info['label'] );
                         if ( $show_currency ) {
-                            $title .= ' "' . $info['symbol'] . '"';
+                            $title .= ' (' . $info['symbol'] . ') ';
                         }
 
                         if ( $show_flag ) {
@@ -2199,10 +2192,10 @@ if ( ! class_exists( 'WCCS' ) ) {
                         $item['title'] = $title;
                         $item['url']   = '#' . $code;
 
-                        $toAdd[] = (object) $item;
+                        $to_add[] = (object) $item;
                     }
 
-                    return array_merge( $items, $toAdd );
+                    return array_merge( $items, $to_add );
                 }
             }
 
@@ -2237,27 +2230,16 @@ if ( ! class_exists( 'WCCS' ) ) {
                 $stickey_switcher = apply_filters( 'wccs_sticky_switcher_enable', true );
 
                 $default_currency = $this->wccs_get_default_currency();
-                // $default_currency = 'USD';
-                $default_label = wccs_get_currency_label( $default_currency );
-                $currencies    = $this->wccs_get_currencies();
-                $currency      = $this->wccs_get_currency();
-                $show_flag     = get_multisite_or_site_option( 'wccs_show_flag', 1 );
+                $default_label    = wccs_get_currency_label( $default_currency );
+                $currencies       = $this->wccs_get_currencies();
+                $currency         = $this->wccs_get_currency();
+                $show_flag        = get_multisite_or_site_option( 'wccs_show_flag', 1 );
 
                 if ( count( $currencies ) ) {
+                    wp_enqueue_style( 'wccs_flags_style', WCCS_PLUGIN_URL . 'assets/lib/flag-icon/flag-icon.css', '', WCCS_VERSION );
+                    wp_enqueue_style( 'wccs_sticky_css', WCCS_PLUGIN_URL . 'assets/frontend/themes/sticky/sticky.css', '', WCCS_VERSION );
 
-                    wp_enqueue_style( 'wccs_flags_style', WCCS_PLUGIN_URL . 'assets/lib/flag-icon/flag-icon.css', '', '1.0' );
-                    wp_enqueue_style( 'wccs_sticky_css', WCCS_PLUGIN_URL . 'assets/frontend/themes/sticky/theme-05.css', '', '1.0' );
-
-                    //Compatibility with Oxygen builder
-                    if ( function_exists( 'oxygen_vsb_user_can_use_advanced_tab' ) ) {
-                        if ( ! oxygen_vsb_user_can_use_advanced_tab() ) {
-
-                            wp_enqueue_script( 'wccs_sticky_script', WCCS_PLUGIN_URL . 'assets/frontend/themes/sticky/sticky.js', [ 'jquery' ], '1.0&t=' . gmdate( 'dmYHis' ) );
-                        }
-                    } else {
-                        wp_enqueue_script( 'wccs_sticky_script', WCCS_PLUGIN_URL . 'assets/frontend/themes/sticky/sticky.js', [ 'jquery' ], '1.0&t=' . gmdate( 'dmYHis' ) );
-                    }
-
+                    wp_enqueue_script( 'wccs_sticky_script', WCCS_PLUGIN_URL . 'assets/frontend/themes/sticky/sticky.js', [], WCCS_VERSION, true );
                     ?>
                     <div id="wcc-sticky-list-wrapper" class="<?php if ( count( $currencies ) > 4 ) { ?>
                     wcc-with-more<?php } ?> 
@@ -2268,18 +2250,23 @@ if ( ! class_exists( 'WCCS' ) ) {
                             ?>
                             <div id="wccs_sticky_container">
                                 <ul class="wcc-sticky-list">
-                                    <li class="d-flex sticky-def <?php if ( ! $currency ) { ?>
-                                    crnt<?php } ?>" data-code="<?php echo esc_attr( $default_currency ); ?>">
+                                    <li class="d-flex sticky-def 
+                                    <?php
+                                    if ( ! $currency ) {
+                                        echo 'crnt'; }
+                                    ?>
+                                    " data-code="<?php echo esc_attr( $default_currency ); ?>">
                                         <span class="wcc-name"><?php echo esc_html( $default_currency ); ?></span>
-                                        <?php if ( ! empty( $this->wccs_get_default_currency_flag() ) ) : ?>
+                                        <?php if ( ! empty( $this->wccs_get_default_currency_flag() ) ) { ?>
                                             <span class="wcc-flag 
                                             <?php
                                             if ( $show_flag && $this->wccs_get_default_currency_flag() ) {
-                                                ?>
-                                                flag-icon flag-icon-<?php echo esc_attr( $this->wccs_get_default_currency_flag() ); } ?>"></span>
-                                        <?php else : ?>
+                                                echo 'flag-icon flag-icon-' . esc_attr( $this->wccs_get_default_currency_flag() ); }
+                                            ?>
+                                            "></span>
+                                        <?php } else { ?>
                                             <span class="wcc-flag"><?php echo esc_html__( 'Def', 'wccs' ); ?></span>
-                                        <?php endif; ?>
+                                        <?php } ?>
                                     </li>
                                     <?php
                                     if ( isset( $currencies[ $currency ] ) ) {
@@ -2290,8 +2277,9 @@ if ( ! class_exists( 'WCCS' ) ) {
                                             <span class="wcc-flag 
                                             <?php
                                             if ( $show_flag && $selected_currency['flag'] ) {
-                                                ?>
-                                                flag-icon flag-icon-<?php echo esc_attr( $selected_currency['flag'] ); } ?>"></span>
+                                                echo 'flag-icon flag-icon-' . esc_attr( $selected_currency['flag'] ); }
+                                            ?>
+                                            "></span>
                                         </li>
                                         <?php
                                         unset( $currencies[ $currency ] );
@@ -2304,8 +2292,9 @@ if ( ! class_exists( 'WCCS' ) ) {
                                             <span class="wcc-flag 
                                             <?php
                                             if ( $show_flag && $info['flag'] ) {
-                                                ?>
-                                                flag-icon flag-icon-<?php echo esc_attr( $info['flag'] ); } ?>"></span>
+                                                echo 'flag-icon flag-icon-' . esc_attr( $info['flag'] ); }
+                                            ?>
+                                            "></span>
                                         </li>
                                         <?php
                                     }

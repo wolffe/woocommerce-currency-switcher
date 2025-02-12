@@ -1,7 +1,5 @@
 <?php
-
 if ( ! function_exists( 'get_all_active_payment_gateways' ) ) {
-
     function get_all_active_payment_gateways() {
         $gateways         = WC()->payment_gateways->get_available_payment_gateways();
         $enabled_gateways = [];
@@ -19,11 +17,9 @@ if ( ! function_exists( 'get_all_active_payment_gateways' ) ) {
 
         return $enabled_gateways;
     }
-
 }
 
 if ( ! function_exists( 'wccs_delete_all_between' ) ) {
-
     function wccs_delete_all_between( $beginning, $end, $string ) {
         $beginningPos = strpos( $string, $beginning );
         $endPos       = strpos( $string, $end );
@@ -35,11 +31,9 @@ if ( ! function_exists( 'wccs_delete_all_between' ) ) {
 
         return wccs_delete_all_between( $beginning, $end, str_replace( $textToDelete, '', $string ) ); // recursion to ensure all occurrences are replaced
     }
-
 }
 
 if ( ! function_exists( 'wccs_get_country_currency' ) ) {
-
     function wccs_get_country_currency( $code ) {
         $arr = [
             'AF' => 'AFN',
@@ -283,11 +277,9 @@ if ( ! function_exists( 'wccs_get_country_currency' ) ) {
 
         return isset( $arr[ $code ] ) ? $arr[ $code ] : '';
     }
-
 }
 
 if ( ! function_exists( 'wccs_free_shipping_criteria' ) ) {
-
     function wccs_free_shipping_criteria() {
         if ( class_exists( 'WCCS' ) ) {
 
@@ -1029,7 +1021,7 @@ if ( ! function_exists( 'wccs_get_email_body' ) ) {
         switch ( $type ) {
             case 'currency_update':
                 if ( isset( $args['changed'] ) && count( $args['changed'] ) ) {
-                    $message .= 'Dear admin,<br/>';
+                    $message .= 'Dear admin,<br>';
                     $message .= 'This email was sent to you to let you know which currencies rates were updated.';
                     $message .= '<table>';
                     $message .= '<thead>';
@@ -1068,4 +1060,23 @@ if ( ! function_exists( 'get_multisite_or_site_option' ) ) {
         return $wccs_option;
     }
 
+}
+
+if ( ! function_exists( 'wccs_country_to_emoji' ) ) {
+    /**
+     * Usage:
+     *
+     * echo wccs_country_to_emoji('IE'); // 🇮🇪
+     * echo wccs_country_to_emoji('GB'); // 🇬🇧
+     * echo wccs_country_to_emoji('US'); // 🇺🇸
+     */
+    function wccs_country_to_emoji( string $country_code ): string {
+        $country_code = strtoupper( $country_code ); // Ensure uppercase
+        return mb_convert_encoding(
+            '&#' . ( 127397 + ord( $country_code[0] ) ) . ';' .
+            '&#' . ( 127397 + ord( $country_code[1] ) ) . ';',
+            'UTF-8',
+            'HTML-ENTITIES'
+        );
+    }
 }

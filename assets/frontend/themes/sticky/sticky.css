@@ -2,19 +2,20 @@
 #wcc-sticky-list-wrapper .wcc-sticky-list li {
     width: 100%;
     cursor: pointer;
-    height: 36px;
+    margin: 0;
     padding: 0 0.9375em;
     background: #eeecec;
 }
 #wcc-sticky-list-wrapper .wcc-sticky-list li.crnt,
 #wcc-sticky-list-wrapper .wcc-sticky-list li:hover {
-    background: #666666;
+    background: #57606f;
 }
 #wcc-sticky-list-wrapper {
     position: fixed;
-    right: -4px;
+    right: 0;
     left: auto;
-    top: 25%;
+    top: 50%;
+    transform: translateY(-50%);
     color: #000;
     max-width: 100px;
     width: 100px;
@@ -46,16 +47,15 @@
     gap: 0.5em;
     padding: 0;
     margin: 0;
-    margin-top: 25px;
 }
 #wcc-sticky-list-wrapper .wcc-sticky-list li {
     align-items: center;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     width: 100px;
-    transform: translateX(17px);
+    transform: translateX(16px);
     display: flex;
     gap: 0.625em;
-    background: #eeecec;
+    background: #f1f2f6;
     border-radius: 50px 0 0 50px;
     padding: 0.3125em !important;
     border: none;
@@ -69,16 +69,6 @@
 }
 #wcc-sticky-list-wrapper .wcc-sticky-list li:last-child {
     margin-bottom: 0;
-}
-#wcc-sticky-list-wrapper .wcc-sticky-list .sticky-def {
-    margin-right: 4px;
-}
-#wcc-sticky-list-wrapper.wcc-with-more {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 26px;
-    padding-bottom: 20px;
 }
 #wcc-sticky-list-wrapper.wcc-sticky-left {
     right: auto;
@@ -98,12 +88,6 @@
 #wcc-sticky-list-wrapper.wcc-sticky-left .wcc-sticky-list .wcc-name {
     margin-right: 0;
     margin-left: 0.4375em;
-}
-#wcc-sticky-list-wrapper.wcc-sticky-left.wcc-with-more:before {
-    left: calc(50% - 50px);
-}
-#wcc-sticky-list-wrapper.wcc-sticky-left.wcc-with-more:after {
-    left: calc(50% + 1px);
 }
 #wccs_sticky_container {
     padding: 0;

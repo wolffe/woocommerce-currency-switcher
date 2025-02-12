@@ -1,42 +1,57 @@
-jQuery(document).ready(function($){
-    /* Do slide function when click main button-------------- */
-    $(".wcc-switcher-style-01").find(".wcc-crnt-currency").on("click", function () {
-        // Define which theme is clicked
-        let $this;
-        $this = $(this).parent();
-        $thisCrnt = $this.find(".wcc-crnt-currency");
-        $thisList = $this.find(".wcc-list");               
+document.addEventListener("DOMContentLoaded", function () {
+    // Handle click on main button
+    document.querySelectorAll(".wcc-switcher-style-01 .wcc-crnt-currency").forEach(function (button) {
+        button.addEventListener("click", function () {
+            let parent = this.parentElement;
+            let currentCurrency = parent.querySelector(".wcc-crnt-currency");
+            let list = parent.querySelector(".wcc-list");
 
-        $thisList.slideToggle();
-        
-        function toggleClass() {
-            if ($thisCrnt.hasClass("wcc-list-opened")) {
-                $thisCrnt.removeClass("wcc-list-opened");                
-            } else {
-                $thisCrnt.addClass("wcc-list-opened");                
-            }            
-        }        
+            if (list) {
+                list.style.display = list.style.display === "block" ? "none" : "block";
+            }
 
-        toggleClass()
+            function toggleClass() {
+                currentCurrency.classList.toggle("wcc-list-opened");
+            }
 
-        /* Do slide function when select item
-          and add 'crnt' class to selected item ---------------- */
-        $thisList.find("li").on("click", function () {
-            var selectedItemHTML = $(this).html();
-            $thisList.find(".crnt").removeClass("crnt");
-            $(this).addClass("crnt");            
-            $thisList.slideUp();            
-            $thisCrnt.html(selectedItemHTML);
-            $thisCrnt.removeClass("wcc-list-opened")
+            toggleClass();
+
+            // Handle click on list items
+            if (list) {
+                list.querySelectorAll("li").forEach(function (item) {
+                    item.addEventListener("click", function () {
+                        let selectedItemHTML = this.innerHTML;
+                        list.querySelectorAll(".crnt").forEach(function (el) {
+                            el.classList.remove("crnt");
+                        });
+                        this.classList.add("crnt");
+
+                        list.style.display = "none"; // Slide up (hide)
+                        currentCurrency.innerHTML = selectedItemHTML;
+                        currentCurrency.classList.remove("wcc-list-opened");
+                    });
+                });
+            }
         });
     });
 
-});
+    // Handle click on list items inside #wcc-switcher-style-01
+    document.addEventListener("click", function (event) {
+        if (event.target.closest("#wcc-switcher-style-01 ul li")) {
+            let item = event.target.closest("li");
+            let code = item.getAttribute("data-code");
+            let switcher = document.querySelector(".wcc_switcher_form_01 .wcc_switcher");
 
-jQuery(document).ready(function($){
-    $(document).on('click', '#wcc-switcher-style-01 ul li', function(){
-        var code = $(this).data('code');
-        $('.wcc_switcher_form_01 .wcc_switcher').val(code);
-        setTimeout(function(){ $('form.wcc_switcher_form_01').submit(); }, 500);
+            if (switcher) {
+                switcher.value = code;
+            }
+
+            setTimeout(function () {
+                let form = document.querySelector("form.wcc_switcher_form_01");
+                if (form) {
+                    form.submit();
+                }
+            }, 500);
+        }
     });
 });
