@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Currency Switcher
  * Description: Allow your customers to shop seamlessly in their preferred currency. Allow fixed prices in multiple currencies, multiple display prices and accepts payments in multiple currencies.
- * Version: 4.1.0
+ * Version: 4.1.1
  * Author: getButterfly
  * Author URI: http://getbutterfly.com/
  * Update URI: http://getbutterfly.com/
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'WCCS_DIR', __DIR__ );
-define( 'WCCS_VERSION', '4.1.0' );
+define( 'WCCS_VERSION', '4.1.1' );
 define( 'WCCS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WCCS_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 
