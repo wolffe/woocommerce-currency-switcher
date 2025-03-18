@@ -4,7 +4,7 @@ Tags: multi, currency, switcher
 Requires at least: 6.0
 Tested up to: 6.7.2
 Requires PHP: 7.2
-Stable tag: 4.2.1
+Stable tag: 4.2.3
 License: GNU General Public License v3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
