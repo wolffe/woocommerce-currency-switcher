@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Currency Switcher
  * Description: Allow your customers to shop seamlessly in their preferred currency. Allow fixed prices in multiple currencies, multiple display prices and accepts payments in multiple currencies.
- * Version: 4.2.1
+ * Version: 4.2.2
  * Author: getButterfly
  * Author URI: http://getbutterfly.com/
  * Update URI: http://getbutterfly.com/
@@ -58,6 +58,14 @@ class WC_Currency_Switcher {
 
         // Filter available payment gateways based on currency
         add_filter( 'woocommerce_available_payment_gateways', [ $this, 'filter_gateways_based_on_currency' ], 10, 1 );
+
+        // Add gateway title filter
+        add_filter( 'woocommerce_gateway_title', [ $this, 'append_gateway_method_to_title' ], 10, 2 );
+
+        // Add product-specific gateway settings
+        add_filter( 'woocommerce_product_data_tabs', [ $this, 'add_product_gateway_tab' ] );
+        add_action( 'woocommerce_product_data_panels', [ $this, 'add_product_gateway_settings' ] );
+        add_action( 'woocommerce_process_product_meta', [ $this, 'save_product_gateway_settings' ] );
 
         // Add admin scripts
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_scripts' ] );
@@ -554,9 +562,12 @@ class WC_Currency_Switcher {
         $recursion = true;
 
         try {
-            $current_currency = $this->get_current_currency();
-            if ( isset( $this->currencies[ $current_currency ] ) ) {
-                return $this->currencies[ $current_currency ];
+            // Only change symbol on frontend
+            if ( ! is_admin() ) {
+                $current_currency = $this->get_current_currency();
+                if ( isset( $this->currencies[ $current_currency ] ) ) {
+                    return $this->currencies[ $current_currency ];
+                }
             }
         } finally {
             $recursion = false;
@@ -675,6 +686,7 @@ class WC_Currency_Switcher {
             <thead>
                 <tr>
                     <th><?php _e( 'Payment Gateway', 'woocommerce-currency-switcher' ); ?></th>
+                    <th><?php _e( 'Method', 'woocommerce-currency-switcher' ); ?></th>
                     <th><?php _e( 'Supported Currencies', 'woocommerce-currency-switcher' ); ?></th>
                 </tr>
             </thead>
@@ -692,6 +704,7 @@ class WC_Currency_Switcher {
                     ?>
                     <tr>
                         <td><?php echo esc_html( $gateway->title ); ?></td>
+                        <td><code><?php echo esc_html( $gateway_id ); ?></code></td>
                         <td>
                             <select class="wc-enhanced-select" 
                                     name="gateway_<?php echo esc_attr( $gateway_id ); ?>[]" 
@@ -849,21 +862,121 @@ class WC_Currency_Switcher {
     }
 
     public function filter_gateways_based_on_currency( $gateway_list ) {
-        // Get the current currency
+        // First filter by product-specific settings if we're on the checkout page
+        if ( is_checkout() && WC()->cart ) {
+            $cart_items                = WC()->cart->get_cart();
+            $product_specific_gateways = [];
+
+            // Get allowed gateways for each product in cart
+            foreach ( $cart_items as $cart_item ) {
+                $product_id       = $cart_item['product_id'];
+                $allowed_gateways = get_post_meta( $product_id, '_allowed_payment_gateways', true );
+
+                if ( ! empty( $allowed_gateways ) && is_array( $allowed_gateways ) ) {
+                    if ( empty( $product_specific_gateways ) ) {
+                        $product_specific_gateways = $allowed_gateways;
+                    } else {
+                        // Only keep gateways that are allowed for all products
+                        $product_specific_gateways = array_intersect( $product_specific_gateways, $allowed_gateways );
+                    }
+                }
+            }
+
+            // If we have product-specific gateways, filter the list and return
+            if ( ! empty( $product_specific_gateways ) ) {
+                foreach ( $gateway_list as $gateway_id => $gateway ) {
+                    if ( ! in_array( $gateway_id, $product_specific_gateways ) ) {
+                        unset( $gateway_list[ $gateway_id ] );
+                    }
+                }
+                return $gateway_list;
+            }
+        }
+
+        // Only filter by currency if no product-specific settings are in effect
         $current_currency = $this->get_current_currency();
+        $gateway_settings = get_option( 'wc_currency_switcher_gateway_settings', [] );
 
-        // Get the saved settings
-        $settings = get_option( 'wc_currency_switcher_gateway_settings', [] );
-
-        // Filter gateways based on settings
         foreach ( $gateway_list as $gateway_id => $gateway ) {
             $key = $gateway_id . '_' . $current_currency;
-            if ( ! isset( $settings[ $key ] ) || ! $settings[ $key ] ) {
+            if ( ! isset( $gateway_settings[ $key ] ) || ! $gateway_settings[ $key ] ) {
                 unset( $gateway_list[ $gateway_id ] );
             }
         }
 
         return $gateway_list;
+    }
+
+    public function append_gateway_method_to_title( $title, $gateway_id ) {
+        // Get the gateway object
+        $gateways = WC()->payment_gateways->payment_gateways();
+        if ( isset( $gateways[ $gateway_id ] ) ) {
+            $gateway = $gateways[ $gateway_id ];
+            // Get the gateway name from the gateway object
+            $gateway_name = $gateway->get_method_title();
+            // Only append if the name is different from the title
+            if ( $gateway_name !== $title ) {
+                return $title . ' (' . $gateway_name . ')';
+            }
+        }
+        return $title;
+    }
+
+    public function add_product_gateway_tab( $tabs ) {
+        $tabs['payment_gateways'] = [
+            'label'    => __( 'Payment Gateways', 'woocommerce-currency-switcher' ),
+            'target'   => 'payment_gateways_product_data',
+            'class'    => [ 'show_if_simple', 'show_if_variable' ],
+            'priority' => 70,
+        ];
+        return $tabs;
+    }
+
+    public function add_product_gateway_settings() {
+        global $post;
+
+        // Get all available payment gateways
+        $gateways = WC()->payment_gateways->payment_gateways();
+
+        // Get saved allowed gateways for this product
+        $allowed_gateways = get_post_meta( $post->ID, '_allowed_payment_gateways', true );
+        if ( ! is_array( $allowed_gateways ) ) {
+            $allowed_gateways = [];
+        }
+
+        echo '<div id="payment_gateways_product_data" class="panel woocommerce_options_panel">';
+        echo '<div class="options_group">';
+        echo '<p class="form-field"><strong>' . __( 'Payment Gateways', 'woocommerce-currency-switcher' ) . '</strong></p>';
+        echo '<p class="description">' . __( 'Select which payment gateways are allowed for this product. Leave empty to allow all gateways.', 'woocommerce-currency-switcher' ) . '</p>';
+
+        foreach ( $gateways as $gateway_id => $gateway ) {
+            $label = $gateway->get_method_title();
+            if ( empty( $label ) ) {
+                $label = $gateway->title;
+            }
+            $label .= ' (' . $gateway_id . ')';
+
+            woocommerce_wp_checkbox(
+                [
+                    'id'          => 'allowed_payment_gateways[' . $gateway_id . ']',
+                    'label'       => $label,
+                    'description' => $gateway->get_description(),
+                    'value'       => in_array( $gateway_id, $allowed_gateways ) ? 'yes' : 'no',
+                ]
+            );
+        }
+
+        echo '</div>';
+        echo '</div>';
+    }
+
+    public function save_product_gateway_settings( $post_id ) {
+        if ( isset( $_POST['allowed_payment_gateways'] ) ) {
+            $allowed_gateways = array_keys( array_filter( $_POST['allowed_payment_gateways'] ) );
+            update_post_meta( $post_id, '_allowed_payment_gateways', $allowed_gateways );
+        } else {
+            update_post_meta( $post_id, '_allowed_payment_gateways', [] );
+        }
     }
 }
 
