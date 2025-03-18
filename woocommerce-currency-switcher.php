@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Currency Switcher
  * Description: Allow your customers to shop seamlessly in their preferred currency. Allow fixed prices in multiple currencies, multiple display prices and accepts payments in multiple currencies.
- * Version: 4.2.0
+ * Version: 4.2.1
  * Author: getButterfly
  * Author URI: http://getbutterfly.com/
  * Update URI: http://getbutterfly.com/
@@ -55,6 +55,9 @@ class WC_Currency_Switcher {
         add_filter( 'woocommerce_settings_tabs_array', [ $this, 'add_settings_tab' ], 50 );
         add_action( 'woocommerce_settings_tabs_currency_switcher', [ $this, 'settings_tab' ] );
         add_action( 'woocommerce_update_options_currency_switcher', [ $this, 'update_settings' ] );
+
+        // Filter available payment gateways based on currency
+        add_filter( 'woocommerce_available_payment_gateways', [ $this, 'filter_gateways_based_on_currency' ], 10, 1 );
 
         // Add admin scripts
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_scripts' ] );
@@ -645,7 +648,76 @@ class WC_Currency_Switcher {
     }
 
     public function settings_tab() {
-        woocommerce_admin_fields( $this->get_settings() );
+        // Check if WooCommerce is active
+        if ( ! class_exists( 'WooCommerce' ) ) {
+            echo '<div class="notice notice-error"><p>' . __( 'WooCommerce is not active. Please install and activate WooCommerce to use this plugin.', 'woocommerce-currency-switcher' ) . '</p></div>';
+            return;
+        }
+
+        // Get all settings
+        $settings = $this->get_settings();
+        woocommerce_admin_fields( $settings );
+
+        // Get gateway settings
+        $gateway_settings = get_option( 'wc_currency_switcher_gateway_settings', [] );
+
+        // Get all WooCommerce payment gateways
+        $gateways = WC()->payment_gateways->payment_gateways();
+
+        // Get all available currencies
+        $currencies = get_woocommerce_currencies();
+
+        // Display the gateway settings form
+        ?>
+        <h2><?php _e( 'Payment Gateway Settings', 'woocommerce-currency-switcher' ); ?></h2>
+        <p><?php _e( 'Configure which payment gateways are available for each currency.', 'woocommerce-currency-switcher' ); ?></p>
+        <table class="wp-list-table widefat fixed striped">
+            <thead>
+                <tr>
+                    <th><?php _e( 'Payment Gateway', 'woocommerce-currency-switcher' ); ?></th>
+                    <th><?php _e( 'Supported Currencies', 'woocommerce-currency-switcher' ); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                foreach ( $gateways as $gateway_id => $gateway ) :
+                    // Get enabled currencies for this gateway
+                    $enabled_currencies = [];
+                    foreach ( $currencies as $currency_code => $currency_name ) {
+                        $key = $gateway_id . '_' . $currency_code;
+                        if ( isset( $gateway_settings[ $key ] ) && $gateway_settings[ $key ] ) {
+                            $enabled_currencies[] = $currency_code;
+                        }
+                    }
+                    ?>
+                    <tr>
+                        <td><?php echo esc_html( $gateway->title ); ?></td>
+                        <td>
+                            <select class="wc-enhanced-select" 
+                                    name="gateway_<?php echo esc_attr( $gateway_id ); ?>[]" 
+                                    multiple="multiple" 
+                                    style="width: 100%;">
+                                <?php foreach ( $currencies as $currency_code => $currency_name ) : ?>
+                                    <option value="<?php echo esc_attr( $currency_code ); ?>" 
+                                            <?php echo in_array( $currency_code, $enabled_currencies ) ? 'selected="selected"' : ''; ?>>
+                                        <?php echo esc_html( $currency_name ); ?> (<?php echo esc_html( $currency_code ); ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <script type="text/javascript">
+            jQuery(document).ready(function($) {
+                $('.wc-enhanced-select').select2({
+                    placeholder: '<?php _e( 'Select currencies...', 'woocommerce-currency-switcher' ); ?>',
+                    allowClear: true
+                });
+            });
+        </script>
+        <?php
     }
 
     public function update_settings() {
@@ -662,6 +734,21 @@ class WC_Currency_Switcher {
         }
 
         update_option( 'wc_currency_switcher_currencies', $currencies );
+
+        // Update gateway settings
+        $gateways     = WC()->payment_gateways->payment_gateways();
+        $new_settings = [];
+        foreach ( $gateways as $gateway_id => $gateway ) {
+            if ( isset( $_POST[ 'gateway_' . $gateway_id ] ) ) {
+                $selected_currencies = array_map( 'sanitize_text_field', $_POST[ 'gateway_' . $gateway_id ] );
+                foreach ( $selected_currencies as $currency_code ) {
+                    $key                  = $gateway_id . '_' . $currency_code;
+                    $new_settings[ $key ] = 1;
+                }
+            }
+        }
+
+        update_option( 'wc_currency_switcher_gateway_settings', $new_settings );
     }
 
     public function admin_scripts( $hook ) {
@@ -759,6 +846,24 @@ class WC_Currency_Switcher {
         </div>';
 
         return $out;
+    }
+
+    public function filter_gateways_based_on_currency( $gateway_list ) {
+        // Get the current currency
+        $current_currency = $this->get_current_currency();
+
+        // Get the saved settings
+        $settings = get_option( 'wc_currency_switcher_gateway_settings', [] );
+
+        // Filter gateways based on settings
+        foreach ( $gateway_list as $gateway_id => $gateway ) {
+            $key = $gateway_id . '_' . $current_currency;
+            if ( ! isset( $settings[ $key ] ) || ! $settings[ $key ] ) {
+                unset( $gateway_list[ $gateway_id ] );
+            }
+        }
+
+        return $gateway_list;
     }
 }
 
