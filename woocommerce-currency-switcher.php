@@ -2,19 +2,19 @@
 /**
  * Plugin Name: WooCommerce Currency Switcher
  * Description: Allow your customers to shop seamlessly in their preferred currency. Allow fixed prices in multiple currencies, multiple display prices and accepts payments in multiple currencies.
- * Version: 4.2.3
+ * Version: 4.3.0
  * Author: getButterfly
  * Author URI: http://getbutterfly.com/
  * Update URI: http://getbutterfly.com/
  * Requires at least: 6.0
  * Requires Plugins: woocommerce
- * Tested up to: 6.7.2
+ * Tested up to: 6.8
  * License: GNU General Public License v3 or later
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: woocommerce-currency-switcher
  *
  * WC requires at least: 7.0.0
- * WC tested up to: 9.7.1
+ * WC tested up to: 9.8.1
  */
 
 // Exit if accessed directly
@@ -91,9 +91,9 @@ class WC_Currency_Switcher {
         add_action( 'woocommerce_save_product_variation', [ $this, 'save_variation_custom_price_fields' ], 10, 2 );
 
         // Price filters
-        add_filter( 'woocommerce_get_price', [ $this, 'get_custom_price' ], 10, 2 );
-        add_filter( 'woocommerce_get_regular_price', [ $this, 'get_custom_price' ], 10, 2 );
-        add_filter( 'woocommerce_get_sale_price', [ $this, 'get_custom_price' ], 10, 2 );
+        add_filter( 'woocommerce_product_get_price', [ $this, 'get_custom_price' ], 10, 2 );
+        add_filter( 'woocommerce_product_get_regular_price', [ $this, 'get_custom_price' ], 10, 2 );
+        add_filter( 'woocommerce_product_get_sale_price', [ $this, 'get_custom_price' ], 10, 2 );
         add_filter( 'woocommerce_cart_item_price', [ $this, 'get_custom_cart_item_price' ], 10, 3 );
         add_filter( 'woocommerce_cart_item_subtotal', [ $this, 'get_custom_cart_item_subtotal' ], 10, 3 );
 
@@ -127,14 +127,14 @@ class WC_Currency_Switcher {
             'woocommerce-currency-switcher',
             plugins_url( 'assets/css/style.css', __FILE__ ),
             [],
-            '1.0.0'
+            '4.3.0'
         );
 
         wp_enqueue_script(
             'woocommerce-currency-switcher',
             plugins_url( 'assets/js/currency-switcher.js', __FILE__ ),
             [ 'jquery' ],
-            '1.0.0',
+            '4.3.0',
             true
         );
 
