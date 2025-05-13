@@ -2,19 +2,19 @@
 /**
  * Plugin Name: WooCommerce Currency Switcher
  * Description: Allow your customers to shop seamlessly in their preferred currency. Allow fixed prices in multiple currencies, multiple display prices and accepts payments in multiple currencies.
- * Version: 4.3.0
+ * Version: 4.3.1
  * Author: getButterfly
  * Author URI: http://getbutterfly.com/
  * Update URI: http://getbutterfly.com/
  * Requires at least: 6.0
  * Requires Plugins: woocommerce
- * Tested up to: 6.8
+ * Tested up to: 6.8.1
  * License: GNU General Public License v3 or later
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: woocommerce-currency-switcher
  *
  * WC requires at least: 7.0.0
- * WC tested up to: 9.8.1
+ * WC tested up to: 9.8.5
  */
 
 // Exit if accessed directly
@@ -298,7 +298,7 @@ class WC_Currency_Switcher {
             }
 
             // Clear any WooCommerce transients to ensure fresh price calculations
-            if ( class_exists('WC_Cache_Helper') ) {
+            if ( class_exists( 'WC_Cache_Helper' ) ) {
                 WC_Cache_Helper::get_transient_version( 'product', true );
             }
 
@@ -696,14 +696,14 @@ class WC_Currency_Switcher {
 
         // Ensure session is started if needed
         if ( ! WC()->session->has_session() ) {
-             WC()->session->set_customer_session_cookie( true );
+            WC()->session->set_customer_session_cookie( true );
         }
 
         // Get currency from option (safe here, not inside filter)
         $option_currency = get_option( 'wc_currency_switcher_currency' );
 
         if ( ! empty( $option_currency ) && array_key_exists( $option_currency, get_woocommerce_currencies() ) ) {
-           WC()->session->set( 'wcc_selected_currency', $option_currency );
+            WC()->session->set( 'wcc_selected_currency', $option_currency );
         }
     }
 
