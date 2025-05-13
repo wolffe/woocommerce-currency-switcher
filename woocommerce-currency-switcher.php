@@ -84,6 +84,9 @@ class WC_Currency_Switcher {
         // Auto-detect currency on first visit
         add_action( 'template_redirect', [ $this, 'auto_detect_currency' ] );
 
+        // Initialize session currency from option
+        add_action( 'template_redirect', [ $this, 'maybe_set_session_currency' ], 5 );
+
         // Admin product fields
         add_action( 'woocommerce_product_options_pricing', [ $this, 'add_custom_price_fields' ] );
         add_action( 'woocommerce_process_product_meta', [ $this, 'save_custom_price_fields' ] );
@@ -112,6 +115,9 @@ class WC_Currency_Switcher {
 
         // Currency symbol filter
         add_filter( 'woocommerce_currency_symbol', [ $this, 'change_currency_symbol' ], 999 );
+
+        // Transactional currency filter
+        add_filter( 'woocommerce_currency', [ $this, 'set_transactional_currency' ], 999 );
     }
 
     public function declare_hpos_compatibility() {
@@ -241,6 +247,18 @@ class WC_Currency_Switcher {
     }
 
     private function get_current_currency() {
+        $session_currency = null;
+        // Check session first on frontend
+        if ( ! is_admin() && WC()->session ) {
+            $session_currency = WC()->session->get( 'wcc_selected_currency' );
+        }
+
+        // If session has a value and it's valid, use it
+        if ( ! empty( $session_currency ) && array_key_exists( $session_currency, $this->currencies ) ) {
+            return $session_currency;
+        }
+
+        // Fallback to option if session not set or invalid (safe outside filter)
         return get_option( 'wc_currency_switcher_currency', $this->get_default_currency() );
     }
 
@@ -265,11 +283,24 @@ class WC_Currency_Switcher {
         $currency = isset( $_POST['currency'] ) ? sanitize_text_field( $_POST['currency'] ) : '';
 
         if ( array_key_exists( $currency, $this->currencies ) ) {
+            // Still update option for persistence across sessions/devices
             update_option( 'wc_currency_switcher_currency', $currency );
 
+            // Set session value for current user
+            if ( WC()->session ) {
+                if ( ! WC()->session->has_session() ) {
+                    WC()->session->set_customer_session_cookie( true );
+                }
+                WC()->session->set( 'wcc_selected_currency', $currency );
+            } else {
+                // Handle case where session might not be available (e.g., REST API?)
+                // For now, we rely on the option as fallback.
+            }
+
             // Clear any WooCommerce transients to ensure fresh price calculations
-            WC_Cache_Helper::get_transient_version( 'product', true );
-            WC_Cache_Helper::get_transient_version( 'product-transient', true );
+            if ( class_exists('WC_Cache_Helper') ) {
+                WC_Cache_Helper::get_transient_version( 'product', true );
+            }
 
             wp_send_json_success(
                 [
@@ -653,6 +684,29 @@ class WC_Currency_Switcher {
         }
     }
 
+    public function maybe_set_session_currency() {
+        if ( is_admin() || ! WC()->session ) {
+            return;
+        }
+
+        // If session already has the currency, do nothing
+        if ( WC()->session->get( 'wcc_selected_currency' ) ) {
+            return;
+        }
+
+        // Ensure session is started if needed
+        if ( ! WC()->session->has_session() ) {
+             WC()->session->set_customer_session_cookie( true );
+        }
+
+        // Get currency from option (safe here, not inside filter)
+        $option_currency = get_option( 'wc_currency_switcher_currency' );
+
+        if ( ! empty( $option_currency ) && array_key_exists( $option_currency, get_woocommerce_currencies() ) ) {
+           WC()->session->set( 'wcc_selected_currency', $option_currency );
+        }
+    }
+
     public function add_settings_tab( $settings_tabs ) {
         $settings_tabs['currency_switcher'] = __( 'Currency Switcher', 'woocommerce-currency-switcher' );
         return $settings_tabs;
@@ -977,6 +1031,24 @@ class WC_Currency_Switcher {
         } else {
             update_post_meta( $post_id, '_allowed_payment_gateways', [] );
         }
+    }
+
+    public function set_transactional_currency( $currency ) {
+        // Don't change currency in admin or if session unavailable
+        if ( is_admin() || ! WC()->session ) {
+            return $currency;
+        }
+
+        // Get currency from session
+        $selected_currency = WC()->session->get( 'wcc_selected_currency' );
+
+        // If session has a value and it's a valid WooCommerce currency, use it
+        if ( ! empty( $selected_currency ) && array_key_exists( $selected_currency, get_woocommerce_currencies() ) ) {
+            return $selected_currency;
+        }
+
+        // Otherwise, return the original currency (likely store default)
+        return $currency;
     }
 }
 
