@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WooCommerce Currency Switcher
  * Description: Allow your customers to shop seamlessly in their preferred currency. Allow fixed prices in multiple currencies, multiple display prices and accepts payments in multiple currencies.
- * Version: 4.3.1
+ * Version: 4.3.2
  * Author: getButterfly
  * Author URI: http://getbutterfly.com/
  * Update URI: http://getbutterfly.com/
@@ -128,14 +128,14 @@ class WC_Currency_Switcher {
             'woocommerce-currency-switcher',
             plugins_url( 'assets/css/style.css', __FILE__ ),
             [],
-            '4.3.0'
+            '4.3.2'
         );
 
         wp_enqueue_script(
             'woocommerce-currency-switcher',
             plugins_url( 'assets/js/currency-switcher.js', __FILE__ ),
             [ 'jquery' ],
-            '4.3.0',
+            '4.3.2',
             true
         );
 
@@ -238,7 +238,7 @@ class WC_Currency_Switcher {
     }
 
     private function get_default_currency() {
-        return get_option('woocommerce_currency');
+        return get_option( 'woocommerce_currency' );
     }
 
     private function get_current_currency() {
@@ -915,7 +915,7 @@ class WC_Currency_Switcher {
 
         // Filter by Currency Settings
         $current_transactional_currency = $this->get_current_currency(); // This gets selected currency for transaction
-        $gateway_currency_settings = get_option( 'wc_currency_switcher_gateway_settings', [] );
+        $gateway_currency_settings      = get_option( 'wc_currency_switcher_gateway_settings', [] );
 
         foreach ( $final_gateway_list as $gateway_id => $gateway ) {
             $key = $gateway_id . '_' . $current_transactional_currency;
