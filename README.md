@@ -15,9 +15,9 @@ A WooCommerce plugin that allows you to set fixed prices for products in differe
 
 ## Screenshots
 
-![WooCommerce Currency Switcher](https://getbutterfly.com/wp-content/uploads/2025/03/woocommerce-currency-switcher-1024x637.png)
+![WooCommerce Currency Switcher](https://getbutterfly.com/wp-content/uploads/2025/03/woocommerce-currency-switcher.png)
 
-![WooCommerce Payment Gateways by Currency](https://getbutterfly.com/wp-content/uploads/2025/03/woocommerce-payment-gateways-by-currency-914x1024.png)
+![WooCommerce Payment Gateways by Currency](https://getbutterfly.com/wp-content/uploads/2025/03/woocommerce-payment-gateways-by-currency.png)
 
 ## Installation
 
@@ -106,4 +106,4 @@ For more information about MaxMind integration, please read the [WooCommerce doc
 
 ## Demo
 
-See a demo on [Mellon Educate's website](https://donate.melloneducate.com/) or on [Vault80's Superstore](https://vault80.com/superstore/).
+See a demo on [Mellon Educate's website](https://donate.melloneducate.com/).
