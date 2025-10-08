@@ -2,18 +2,18 @@
 /**
  * Plugin Name: WooCommerce Currency Switcher
  * Description: Allow your customers to shop seamlessly in their preferred currency. Allow fixed prices in multiple currencies, multiple display prices and accepts payments in multiple currencies.
- * Version: 4.3.2
+ * Version: 4.3.3
  * Author: getButterfly
  * Author URI: http://getbutterfly.com/
  * Requires at least: 6.0
  * Requires Plugins: woocommerce
- * Tested up to: 6.8.1
+ * Tested up to: 6.8.3
  * License: GNU General Public License v3 or later
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: woocommerce-currency-switcher
  *
  * WC requires at least: 7.0.0
- * WC tested up to: 9.8.5
+ * WC tested up to: 10.2.2
  */
 
 // Exit if accessed directly
@@ -124,14 +124,14 @@ class WC_Currency_Switcher {
             'woocommerce-currency-switcher',
             plugins_url( 'assets/css/style.css', __FILE__ ),
             [],
-            '4.3.2'
+            '4.3.3'
         );
 
         wp_enqueue_script(
             'woocommerce-currency-switcher',
             plugins_url( 'assets/js/currency-switcher.js', __FILE__ ),
             [ 'jquery' ],
-            '4.3.2',
+            '4.3.3',
             true
         );
 
