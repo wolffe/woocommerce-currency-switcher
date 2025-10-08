@@ -5,7 +5,6 @@
  * Version: 4.3.2
  * Author: getButterfly
  * Author URI: http://getbutterfly.com/
- * Update URI: http://getbutterfly.com/
  * Requires at least: 6.0
  * Requires Plugins: woocommerce
  * Tested up to: 6.8.1
@@ -26,9 +25,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) ) ) {
     return;
 }
-
-// Updater
-require_once plugin_dir_path( __FILE__ ) . 'includes/updater.php';
 
 class WC_Currency_Switcher {
     private static $instance = null;
